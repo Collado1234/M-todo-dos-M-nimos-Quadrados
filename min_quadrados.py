@@ -80,13 +80,12 @@ def ajustar_modelos(x, y):
     b0 = 1
 
     try:
-        # Ajuste Hiperbólico com limites
         params_hip, _ = curve_fit(
-        modelo_hiperbolico,
-        x,
-        y,
-        p0=(100000, 10),   # chute inicial razoável
-        bounds=([0, -100], [1e10, 1000])  # limites inferiores e superiores para (a, b)
+            modelo_hiperbolico,
+            x,
+            y,
+            p0=(max(y) * 10, 1000),
+            bounds=([0, -1e6], [1e12, 1e6])
     )
     except RuntimeError:
         print("Falha no ajuste hiperbólico!")
