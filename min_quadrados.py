@@ -67,25 +67,39 @@ def ajustar_modelos(x, y):
         params_geo (tuple): Parâmetros (a, b) do modelo geométrico (potencial).
         x_geo (np.ndarray): x ajustado para o modelo geométrico (evita zero).
     """
-    # Ajuste Polinomial grau 2 e 3
     coef_poly2 = np.polyfit(x, y, 2)
     coef_poly3 = np.polyfit(x, y, 3)
 
     poly2 = np.poly1d(coef_poly2)
     poly3 = np.poly1d(coef_poly3)
 
-    # Ajuste Exponencial
     params_exp, _ = curve_fit(modelo_exponencial, x, y, p0=(10000, 0.03))
 
-    # Ajuste Hiperbólico
-    params_hip, _ = curve_fit(modelo_hiperbolico, x, y, p0=(1000000, 1))
+    # ----- Hiperbólico -----
+    a0 = max(y) * (max(x) + 1)
+    b0 = 1
 
-    # Ajuste Geométrico (Potencial)
+    try:
+        # Ajuste Hiperbólico com limites
+        params_hip, _ = curve_fit(
+        modelo_hiperbolico,
+        x,
+        y,
+        p0=(100000, 10),   # chute inicial razoável
+        bounds=([0, -100], [1e10, 1000])  # limites inferiores e superiores para (a, b)
+    )
+    except RuntimeError:
+        print("Falha no ajuste hiperbólico!")
+        params_hip = (np.nan, np.nan)
+
+    # ----- Geométrico -----
     x_geo = x.copy()
-    x_geo[x_geo == 0] = 0.1  # Evitar divisão por zero
+    x_geo[x_geo == 0] = 0.1
+
     params_geo, _ = curve_fit(modelo_geometrico, x_geo, y, p0=(10000, 1))
 
     return poly2, poly3, params_exp, params_hip, params_geo, x_geo
+
 
 
 # -------------------
@@ -182,38 +196,3 @@ def imprimir_modelos(poly2, poly3, params_exp, params_hip, params_geo):
     print(f'y = {params_geo[0]:.2f} * x^{params_geo[1]:.5f}')
 
 
-# -------------------
-# Função principal
-# -------------------
-
-def main():
-    """
-    Função principal do script.
-    Executa o carregamento dos dados, ajuste dos modelos, geração dos gráficos e impressão dos modelos.
-    """
-    # 1. Carregar dados
-    anos, x, y = carregar_dados_arquivo(r"E:\UNESP\Unesp 3°Ano - 5°termo\Calc_Numerico\Trabalho_Calc\Populacao_PresidentePrudente.dat")
-
-
-
-    # 2. Ajustar modelos
-    poly2, poly3, params_exp, params_hip, params_geo, x_geo = ajustar_modelos(x, y)
-
-    # 3. Plotar modelos
-    plotar_polinomio(anos, x, y, poly2, grau=2, cor='blue')
-    plotar_polinomio(anos, x, y, poly3, grau=3, cor='red')
-
-    plotar_modelo(anos, x, y, modelo_exponencial, params_exp, 'Exponencial', 'green')
-    plotar_modelo(anos, x, y, modelo_hiperbolico, params_hip, 'Hiperbólico', 'purple')
-    plotar_modelo(anos, x, y, modelo_geometrico, params_geo, 'Geométrico (Potencial)', 'orange', x_model=x_geo)
-
-    # 4. Imprimir modelos encontrados
-    imprimir_modelos(poly2, poly3, params_exp, params_hip, params_geo)
-
-
-# -------------------
-# Execução do script
-# -------------------
-
-if __name__ == "__main__":
-    main()
