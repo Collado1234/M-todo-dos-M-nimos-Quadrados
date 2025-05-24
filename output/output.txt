@@ -1,0 +1,32 @@
+Resultados dos Modelos Ajustados:
+
+1) Modelo Polinomial Grau 2:
+   Função: 
+	        2
+-4.733 x + 3266 x - 968.8
+   R²: 0.9763
+
+2) Modelo Polinomial Grau 3:
+   Função: 
+	         3         2
+-0.6866 x + 79.79 x + 645.9 x + 1.164e+04
+   R²: 0.9914
+
+3) Modelo Exponencial:
+   Função: 
+	y = 45012.32 * exp(0.02117 * x)
+   R²: 0.8867
+
+4) Modelo Hiperbólico:
+   Função: 
+	y = 7164262.36 / (x + 50.00000)
+   R²: -1.0102
+   R² negativo, portanto, modelo não adequado para esses dados
+
+5) Modelo Geométrico (Potencial):
+   Função: 
+	y = 3314.83 * x^0.97117
+   R²: 0.9745
+
+Melhor ajuste: Polinomial Grau 3 (R² = 0.9914)
+Estimativa para o ano de 2030 pelo melhor modelo (Polinomial Grau 3): 215598.30
