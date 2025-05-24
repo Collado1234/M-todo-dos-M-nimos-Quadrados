@@ -20,7 +20,16 @@ Para executar o projeto, você precisará ativar o ambiente virtual e instalar a
    python main.py
    ```
    Para desativar o ambiente virtual, use o comando:
+   ```bash
+   deactivate
+   ```
 
-```bash
-deactivate
-```
+Ou, execute o script `run.sh` para ativar o ambiente virtual e executar o projeto:
+   - No Windows:
+   ```bash
+   ./run.sh
+   ```
+   - No Linux ou MacOS:
+   ```bash
+   source run.sh
+   ```
