@@ -96,8 +96,33 @@ def ajustar_modelos(x, y):
     x_geo[x_geo == 0] = 0.1
 
     params_geo, _ = curve_fit(modelo_geometrico, x_geo, y, p0=(10000, 1))
+    
+    media_real = np.mean(y)
+    n = len(y)
+    valores_estimados_poly2 = poly2(x)
+    r2_poly2 = calcular_coeficiente_determinacao(y, valores_estimados_poly2, media_real, n)
+    
+    valores_estimados_poly3 = poly3(x)
+    r2_poly3 = calcular_coeficiente_determinacao(y, valores_estimados_poly3, media_real, n)
+    
+    valores_estimados_exp = modelo_exponencial(x, *params_exp)
+    r2_exp = calcular_coeficiente_determinacao(y, valores_estimados_exp, media_real, n)
 
-    return poly2, poly3, params_exp, params_hip, params_geo, x_geo
+    valores_estimados_hip = modelo_hiperbolico(x, *params_hip)
+    r2_hip = calcular_coeficiente_determinacao(y, valores_estimados_hip, media_real, n)
+
+    valores_estimados_geo = modelo_geometrico(x_geo, *params_geo)
+    r2_geo = calcular_coeficiente_determinacao(y, valores_estimados_geo, media_real, n)
+    
+    coeficientes = {
+        "poly2": r2_poly2,
+        "poly3": r2_poly3,
+        "exp": r2_exp,
+        "hip": r2_hip,
+        "geo": r2_geo,
+    }
+    
+    return poly2, poly3, params_exp, params_hip, params_geo, x_geo, coeficientes
 
 
 
@@ -165,12 +190,30 @@ def plotar_modelo(anos, x, y, func, params, label, color, x_model=None):
     plt.show()
     plt.savefig(f'output/{label.lower()}.png')
 
+def calcular_coeficiente_determinacao(valores_reais, valores_estimados, media_real, n):
+    """
+    Calcula o coeficiente de determinação (R²) para avaliar a qualidade do ajuste de um modelo.
+    Args:
+        valores_reais (list or array-like): Lista dos valores reais observados.
+        valores_estimados (list or array-like): Lista dos valores estimados pelo modelo.
+        media_real (float): Média dos valores reais observados.
+        n (int): Número de elementos nas listas de valores.
+    """
+    soma_numerador = 0
+    for i in range(0, n):
+        soma_numerador += (valores_reais[i] - valores_estimados[i])**2
+    
+    soma_denominador = 0
+    for i in range(0, n):
+        soma_denominador += (valores_reais[i] - media_real)**2
+        
+    return 1 - soma_numerador/soma_denominador
 
 # -------------------
 # Impressão dos modelos
 # -------------------
 
-def imprimir_modelos(poly2, poly3, params_exp, params_hip, params_geo):
+def imprimir_modelos(poly2, poly3, params_exp, params_hip, params_geo, coeficientes):
     """
     Imprime as equações dos modelos ajustados.
 
@@ -180,20 +223,27 @@ def imprimir_modelos(poly2, poly3, params_exp, params_hip, params_geo):
         params_exp (tuple): Parâmetros exponencial.
         params_hip (tuple): Parâmetros hiperbólico.
         params_geo (tuple): Parâmetros geométrico.
+        coeficientes (dict): Coeficientes de determinação para cada modelo
     """
+
     print('1) Modelo Polinomial Grau 2:')
     print(poly2)
+    print(f'R² Polinomial Grau 2: {coeficientes["poly2"]:.4f}')
 
     print('\n2) Modelo Polinomial Grau 3:')
     print(poly3)
+    print(f'R² Polinomial Grau 3: {coeficientes["poly3"]:.4f}')
 
     print('\n3) Modelo Exponencial:')
     print(f'y = {params_exp[0]:.2f} * exp({params_exp[1]:.5f} * x)')
+    print(f'R² Exponencial: {coeficientes["exp"]:.4f}')
 
     print('\n4) Modelo Hiperbólico:')
     print(f'y = {params_hip[0]:.2f} / (x + {params_hip[1]:.5f})')
+    print(f'R² Hipebólica: {coeficientes["hip"]:.4f}')
 
     print('\n5) Modelo Geométrico (Potencial):')
     print(f'y = {params_geo[0]:.2f} * x^{params_geo[1]:.5f}')
+    print(f'R² Geométrica: {coeficientes["geo"]:.4f}')
 
 
