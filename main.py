@@ -10,7 +10,7 @@ def main():
     Executa o carregamento dos dados, ajuste dos modelos, geração dos gráficos e impressão dos modelos.
     """
     # 1. Carregar dados
-    anos, x, y = mq.carregar_dados_arquivo(r"E:\UNESP\Unesp 3°Ano - 5°termo\Calc_Numerico\Trabalho_Calc\Populacao_PresidentePrudente.dat")
+    anos, x, y = mq.carregar_dados_arquivo("Populacao_PresidentePrudente.dat")
 
 
 
