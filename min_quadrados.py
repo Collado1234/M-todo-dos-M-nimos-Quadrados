@@ -246,4 +246,27 @@ def imprimir_modelos(poly2, poly3, params_exp, params_hip, params_geo, coeficien
     print(f'y = {params_geo[0]:.2f} * x^{params_geo[1]:.5f}')
     print(f'R² Geométrica: {coeficientes["geo"]:.4f}')
 
+    maior_r2 = max(coeficientes.values())
+    melhor_modelo = [k for k, v in coeficientes.items() if v == maior_r2][0]
+    nomes = {
+        "poly2": "Polinomial Grau 2",
+        "poly3": "Polinomial Grau 3",
+        "exp": "Exponencial",
+        "hip": "Hiperbólico",
+        "geo": "Geométrico (Potencial)"
+    }
+    print(f'\nMelhor ajuste: {nomes[melhor_modelo]} (R² = {maior_r2:.4f})')
+
+    x_2030 = 2030 - 1940 
+
+    modelos = {
+        "poly2": lambda x: poly2(x),
+        "poly3": lambda x: poly3(x),
+        "exp": lambda x: modelo_exponencial(x, *params_exp),
+        "hip": lambda x: modelo_hiperbolico(x, *params_hip),
+        "geo": lambda x: modelo_geometrico(x if x != 0 else 0.1, *params_geo)
+    }
+
+    estimativa = modelos[melhor_modelo](x_2030)
+    print(f"Estimativa para o ano de 2030 pelo melhor modelo ({nomes[melhor_modelo]}): {estimativa:.2f}")
 
