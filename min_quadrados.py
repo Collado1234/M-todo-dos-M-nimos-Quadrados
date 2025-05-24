@@ -209,6 +209,84 @@ def calcular_coeficiente_determinacao(valores_reais, valores_estimados, media_re
         
     return 1 - soma_numerador/soma_denominador
 
+def imprimir_melhor_modelo_e_estimativa(poly2, poly3, params_exp, params_hip, params_geo, coeficientes):
+    """
+    Imprime o melhor modelo de ajuste de dados com base no coeficiente de determinação (R²) e estima o valor para o ano de 2030.
+    Args:
+        poly2 (callable): Função do modelo polinomial de grau 2.
+        poly3 (callable): Função do modelo polinomial de grau 3.
+        params_exp (tuple): Parâmetros ajustados para o modelo exponencial.
+        params_hip (tuple): Parâmetros ajustados para o modelo hiperbólico.
+        params_geo (tuple): Parâmetros ajustados para o modelo geométrico (potencial).
+        coeficientes (dict): Dicionário com os nomes dos modelos como chaves e seus respectivos valores de R² como valores.
+    """
+    
+    maior_r2 = max(coeficientes.values())
+    melhor_modelo = [k for k, v in coeficientes.items() if v == maior_r2][0]
+    nomes = {
+        "poly2": "Polinomial Grau 2",
+        "poly3": "Polinomial Grau 3",
+        "exp": "Exponencial",
+        "hip": "Hiperbólico",
+        "geo": "Geométrico (Potencial)"
+    }
+    print(f'\nMelhor ajuste: {nomes[melhor_modelo]} (R² = {maior_r2:.4f})')
+
+    x_2030 = 2030 - 1940 
+
+    modelos = {
+        "poly2": lambda x: poly2(x),
+        "poly3": lambda x: poly3(x),
+        "exp": lambda x: modelo_exponencial(x, *params_exp),
+        "hip": lambda x: modelo_hiperbolico(x, *params_hip),
+        "geo": lambda x: modelo_geometrico(x if x != 0 else 0.1, *params_geo)
+    }
+
+    estimativa = modelos[melhor_modelo](x_2030)
+    print(f"Estimativa para o ano de 2030 pelo melhor modelo ({nomes[melhor_modelo]}): {estimativa:.2f}")
+    return melhor_modelo, maior_r2, nomes, estimativa
+
+def salvar_resultados_em_arquivo(poly2, poly3, params_exp, params_hip, params_geo, coeficientes, melhor_modelo, maior_r2, nomes, estimativa):
+    """
+    Salva os resultados dos ajustes de diferentes modelos matemáticos em um arquivo de texto.
+
+    Args:
+        poly2 (str): Representação da função ajustada do modelo polinomial de grau 2.
+        poly3 (str): Representação da função ajustada do modelo polinomial de grau 3.
+        params_exp (tuple): Parâmetros (a, b) do modelo exponencial na forma y = a * exp(b * x).
+        params_hip (tuple): Parâmetros (a, b) do modelo hiperbólico na forma y = a / (x + b).
+        params_geo (tuple): Parâmetros (a, b) do modelo geométrico (potencial) na forma y = a * x^b.
+        coeficientes (dict): Dicionário contendo os coeficientes de determinação R² para cada modelo, com as chaves 'poly2', 'poly3', 'exp', 'hip' e 'geo'.
+        melhor_modelo (int): Índice do modelo com o melhor ajuste (maior R²).
+        maior_r2 (float): Valor do maior coeficiente de determinação R² encontrado.
+        nomes (list): Lista com os nomes dos modelos, usados para exibição do melhor ajuste.
+        estimativa (float): Valor estimado para o ano de 2030 pelo melhor modelo.
+    """
+    with open('output/output.txt', 'w') as f:
+        f.write('Resultados dos Modelos Ajustados:\n\n')
+        f.write('1) Modelo Polinomial Grau 2:\n')
+        f.write(f'   Função: \n\t{poly2}\n')
+        f.write(f'   R²: {coeficientes["poly2"]:.4f}\n\n')
+
+        f.write('2) Modelo Polinomial Grau 3:\n')
+        f.write(f'   Função: \n\t{poly3}\n')
+        f.write(f'   R²: {coeficientes["poly3"]:.4f}\n\n')
+
+        f.write('3) Modelo Exponencial:\n')
+        f.write(f'   Função: \n\ty = {params_exp[0]:.2f} * exp({params_exp[1]:.5f} * x)\n')
+        f.write(f'   R²: {coeficientes["exp"]:.4f}\n\n')
+
+        f.write('4) Modelo Hiperbólico:\n')
+        f.write(f'   Função: \n\ty = {params_hip[0]:.2f} / (x + {params_hip[1]:.5f})\n')
+        f.write(f'   R²: {coeficientes["hip"]:.4f}\n\n')
+
+        f.write('5) Modelo Geométrico (Potencial):\n')
+        f.write(f'   Função: \n\ty = {params_geo[0]:.2f} * x^{params_geo[1]:.5f}\n')
+        f.write(f'   R²: {coeficientes["geo"]:.4f}\n\n')
+
+        f.write(f'Melhor ajuste: {nomes[melhor_modelo]} (R² = {maior_r2:.4f})\n')
+        f.write(f'Estimativa para o ano de 2030 pelo melhor modelo ({nomes[melhor_modelo]}): {estimativa:.2f}\n')
+
 # -------------------
 # Impressão dos modelos
 # -------------------
@@ -246,52 +324,5 @@ def imprimir_modelos(poly2, poly3, params_exp, params_hip, params_geo, coeficien
     print(f'y = {params_geo[0]:.2f} * x^{params_geo[1]:.5f}')
     print(f'R² Geométrica: {coeficientes["geo"]:.4f}')
 
-    maior_r2 = max(coeficientes.values())
-    melhor_modelo = [k for k, v in coeficientes.items() if v == maior_r2][0]
-    nomes = {
-        "poly2": "Polinomial Grau 2",
-        "poly3": "Polinomial Grau 3",
-        "exp": "Exponencial",
-        "hip": "Hiperbólico",
-        "geo": "Geométrico (Potencial)"
-    }
-    print(f'\nMelhor ajuste: {nomes[melhor_modelo]} (R² = {maior_r2:.4f})')
-
-    x_2030 = 2030 - 1940 
-
-    modelos = {
-        "poly2": lambda x: poly2(x),
-        "poly3": lambda x: poly3(x),
-        "exp": lambda x: modelo_exponencial(x, *params_exp),
-        "hip": lambda x: modelo_hiperbolico(x, *params_hip),
-        "geo": lambda x: modelo_geometrico(x if x != 0 else 0.1, *params_geo)
-    }
-
-    estimativa = modelos[melhor_modelo](x_2030)
-    print(f"Estimativa para o ano de 2030 pelo melhor modelo ({nomes[melhor_modelo]}): {estimativa:.2f}")
-    
-    with open('output/output.txt', 'w') as f:
-        f.write('Resultados dos Modelos Ajustados:\n\n')
-        f.write('1) Modelo Polinomial Grau 2:\n')
-        f.write(f'   Função: \n\t{poly2}\n')
-        f.write(f'   R²: {coeficientes["poly2"]:.4f}\n\n')
-
-        f.write('2) Modelo Polinomial Grau 3:\n')
-        f.write(f'   Função: \n\t{poly3}\n')
-        f.write(f'   R²: {coeficientes["poly3"]:.4f}\n\n')
-
-        f.write('3) Modelo Exponencial:\n')
-        f.write(f'   Função: \n\ty = {params_exp[0]:.2f} * exp({params_exp[1]:.5f} * x)\n')
-        f.write(f'   R²: {coeficientes["exp"]:.4f}\n\n')
-
-        f.write('4) Modelo Hiperbólico:\n')
-        f.write(f'   Função: \n\ty = {params_hip[0]:.2f} / (x + {params_hip[1]:.5f})\n')
-        f.write(f'   R²: {coeficientes["hip"]:.4f}\n\n')
-
-        f.write('5) Modelo Geométrico (Potencial):\n')
-        f.write(f'   Função: \n\ty = {params_geo[0]:.2f} * x^{params_geo[1]:.5f}\n')
-        f.write(f'   R²: {coeficientes["geo"]:.4f}\n\n')
-
-        f.write(f'Melhor ajuste: {nomes[melhor_modelo]} (R² = {maior_r2:.4f})\n')
-        f.write(f'Estimativa para o ano de 2030 pelo melhor modelo ({nomes[melhor_modelo]}): {estimativa:.2f}\n')
-
+    melhor_modelo, maior_r2, nomes, estimativa = imprimir_melhor_modelo_e_estimativa(poly2, poly3, params_exp, params_hip, params_geo, coeficientes)
+    salvar_resultados_em_arquivo(poly2, poly3, params_exp, params_hip, params_geo, coeficientes, melhor_modelo, maior_r2, nomes, estimativa)
