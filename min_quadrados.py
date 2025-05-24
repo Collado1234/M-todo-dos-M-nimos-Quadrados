@@ -84,9 +84,9 @@ def ajustar_modelos(x, y):
             modelo_hiperbolico,
             x,
             y,
-            p0=(max(y) * 10, 1000),
-            bounds=([0, -1e6], [1e12, 1e6])
-    )
+            p0=(max(y), 1),
+            bounds=([0, 0], [1e12, 50])
+        )
     except RuntimeError:
         print("Falha no ajuste hiperbólico!")
         params_hip = (np.nan, np.nan)
@@ -266,23 +266,38 @@ def salvar_resultados_em_arquivo(poly2, poly3, params_exp, params_hip, params_ge
         f.write('Resultados dos Modelos Ajustados:\n\n')
         f.write('1) Modelo Polinomial Grau 2:\n')
         f.write(f'   Função: \n\t{poly2}\n')
-        f.write(f'   R²: {coeficientes["poly2"]:.4f}\n\n')
+        f.write(f'   R²: {coeficientes["poly2"]:.4f}\n')
+        if coeficientes["poly2"] < 0:
+            f.write('   R² negativo, portanto, modelo não adequado para esses dados\n')
+        f.write('\n')
 
         f.write('2) Modelo Polinomial Grau 3:\n')
         f.write(f'   Função: \n\t{poly3}\n')
-        f.write(f'   R²: {coeficientes["poly3"]:.4f}\n\n')
+        f.write(f'   R²: {coeficientes["poly3"]:.4f}\n')
+        if coeficientes["poly3"] < 0:
+            f.write('   R² negativo, portanto, modelo não adequado para esses dados\n')
+        f.write('\n')
 
         f.write('3) Modelo Exponencial:\n')
         f.write(f'   Função: \n\ty = {params_exp[0]:.2f} * exp({params_exp[1]:.5f} * x)\n')
-        f.write(f'   R²: {coeficientes["exp"]:.4f}\n\n')
+        f.write(f'   R²: {coeficientes["exp"]:.4f}\n')
+        if coeficientes["exp"] < 0:
+            f.write('   R² negativo, portanto, modelo não adequado para esses dados\n')
+        f.write('\n')
 
         f.write('4) Modelo Hiperbólico:\n')
         f.write(f'   Função: \n\ty = {params_hip[0]:.2f} / (x + {params_hip[1]:.5f})\n')
-        f.write(f'   R²: {coeficientes["hip"]:.4f}\n\n')
+        f.write(f'   R²: {coeficientes["hip"]:.4f}\n')
+        if coeficientes["hip"] < 0:
+            f.write('   R² negativo, portanto, modelo não adequado para esses dados\n')
+        f.write('\n')
 
         f.write('5) Modelo Geométrico (Potencial):\n')
         f.write(f'   Função: \n\ty = {params_geo[0]:.2f} * x^{params_geo[1]:.5f}\n')
-        f.write(f'   R²: {coeficientes["geo"]:.4f}\n\n')
+        f.write(f'   R²: {coeficientes["geo"]:.4f}\n')
+        if coeficientes["geo"] < 0:
+            f.write('   R² negativo, portanto, modelo não adequado para esses dados\n')
+        f.write('\n')
 
         f.write(f'Melhor ajuste: {nomes[melhor_modelo]} (R² = {maior_r2:.4f})\n')
         f.write(f'Estimativa para o ano de 2030 pelo melhor modelo ({nomes[melhor_modelo]}): {estimativa:.2f}\n')

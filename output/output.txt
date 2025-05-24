@@ -19,8 +19,9 @@ Resultados dos Modelos Ajustados:
 
 4) Modelo Hiperbólico:
    Função: 
-	y = 119488441593.50 / (x + 999985.45105)
-   R²: -0.0001
+	y = 7164262.36 / (x + 50.00000)
+   R²: -1.0102
+   R² negativo, portanto, modelo não adequado para esses dados
 
 5) Modelo Geométrico (Potencial):
    Função: 
