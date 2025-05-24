@@ -130,6 +130,7 @@ def plotar_polinomio(anos, x, y, poly, grau, cor):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+    plt.savefig(f'output/polinomio_grau_{grau}.png')
 
 
 def plotar_modelo(anos, x, y, func, params, label, color, x_model=None):
@@ -162,6 +163,7 @@ def plotar_modelo(anos, x, y, func, params, label, color, x_model=None):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+    plt.savefig(f'output/{label.lower()}.png')
 
 
 # -------------------
